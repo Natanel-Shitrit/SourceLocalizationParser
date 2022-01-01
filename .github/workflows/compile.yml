@@ -38,9 +38,6 @@ jobs:
         meta_branch:
           - master
 
-        meta_version:
-          - latest
-
         include:
           - os: ubuntu-18.04
             os_short: linux
@@ -102,7 +99,7 @@ jobs:
         with:
           repository: alliedmodders/metamod-source
           ref: ${{ matrix.meta_branch }}
-          path: metamod-${{ matrix.meta_version }}
+          path: metamod-${{ matrix.meta_branch }}
 
       - name: ✔️ Checkout SDKs
         shell: bash
@@ -124,8 +121,7 @@ jobs:
         working-directory: src
         run: |
           mkdir build && cd build
-          python ../configure.py --enable-optimize --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_branch }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}"
-
+          python ../configure.py --enable-optimize --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_branch }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_branch }}"
           ambuild
 
       - name: 🏷️ Upload Package
