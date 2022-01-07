@@ -11,6 +11,7 @@
 #include <atomic>
 #include <chrono>
 #include <vector>
+#include <algorithm>
 
 class CPhrasesGenerator :
 	public ILanguageFileParserListener,
