@@ -160,7 +160,7 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 
 void CPhrasesGenerator::State_Ended(bool halted, bool failed)
 {
-	DevMsg("\tParsed %u", m_nParsed);
+	DevMsg("\tParsed %u\n", m_nParsed);
 
 	m_Out
 		<< "\t// " << m_nParsed << " phrases\n";
@@ -182,10 +182,17 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 		const char* pszLanguage = NULL;
 		if (!translator->GetLanguageInfo(n, &m_pszLangCode, &pszLanguage))
 		{
+			DevMsg("Couldn't 'GetLanguageInfo' for n = %d\n", n);
 			continue;
 		}
 
 		m_bEnglishFile = V_stricmp(pszLanguage, "english") == 0;
+
+		if (!m_bEnglishFile && !m_vecLangWhitelist.empty() && std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), pszLanguage) == m_vecLangWhitelist.end())
+		{
+			DevMsg("skipping %s (not in whitelist)\n", pszLanguage);
+			continue;
+		}
 
 		DevMsg("Processing '%s' \"%s\"\n", m_pszLangCode, pszLanguage);
 
@@ -293,4 +300,34 @@ void CPhrasesGenerator::ParseTokensFromFile(const char* pszLangFileBase, const c
 	{
 		DevWarning("'%s': %s\n", relativePath, error);
 	}
+}
+
+void CPhrasesGenerator::LoadWhitelist()
+{
+	char szWhitelistPath[PLATFORM_MAX_PATH];
+
+	// Get path with SM.
+	smutils->BuildPath(Path_SM, szWhitelistPath, sizeof(szWhitelistPath), "configs/LanguagePhrasesParser/whitelist.txt");
+
+	// Creates the folder if it's missing.
+	CreateDirHierarchy(szWhitelistPath);
+
+	// Open file.
+	std::ifstream ifsWhiteList(szWhitelistPath);
+	if (!ifsWhiteList)
+	{
+		DevWarning("No Whitelist found\n");
+		return;
+	}
+
+	std::string line;
+	while (std::getline(ifsWhiteList, line))
+	{
+		if (line.size() > 0)
+		{
+			m_vecLangWhitelist.push_back(line);
+		}
+	}
+
+	ifsWhiteList.close();
 }

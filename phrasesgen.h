@@ -11,6 +11,7 @@
 #include <atomic>
 #include <chrono>
 #include <vector>
+#include <algorithm>
 
 class CPhrasesGenerator :
 	public ILanguageFileParserListener,
@@ -30,6 +31,7 @@ public:
 public:
 	void Generate();
 	void SDK_OnUnload();
+	void LoadWhitelist();
 
 private:
 	enum Section_t
@@ -40,12 +42,7 @@ private:
 		Section_Unknown,
 	};
 
-	bool m_bEnglishFile;
-	const char* m_pszLangCode;
-	std::ofstream m_Out;
-
-	Section_t m_nSection;
-	size_t m_nParsed;
+	std::vector<std::string> m_vecLangWhitelist;
 
 public: // ILanguageFileParserListener
 	ParseAction_t State_EnteredSection(const char* pszKey) override;
@@ -53,6 +50,13 @@ public: // ILanguageFileParserListener
 	void State_Ended(bool halted, bool failed) override;
 
 private:
+	bool m_bEnglishFile;
+	const char* m_pszLangCode;
+	std::ofstream m_Out;
+
+	Section_t m_nSection;
+	size_t m_nParsed;
+
 	IThreadHandle* m_pThread;
 	std::atomic<bool> m_bReqTerm;
 	std::chrono::high_resolution_clock::time_point m_tmBegin;
