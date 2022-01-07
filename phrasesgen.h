@@ -18,10 +18,8 @@ class CPhrasesGenerator :
 {
 public:
 	CPhrasesGenerator():
-		m_vecLangWhitelist(0),
 		m_bEnglishFile(false),
 		m_pszLangCode(NULL),
-		m_Out(0),
 		m_nSection(Section_None),
 		m_nParsed(0),
 		m_pThread(NULL),
