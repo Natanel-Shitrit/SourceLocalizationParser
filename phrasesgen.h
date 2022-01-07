@@ -6,12 +6,12 @@
 
 #include <string>
 #include <unordered_set>
-#include <filesystem.h>
 #include <fstream>
 #include <atomic>
 #include <chrono>
 #include <vector>
 #include <algorithm>
+#include <experimental/filesystem>
 
 class CPhrasesGenerator :
 	public ILanguageFileParserListener,

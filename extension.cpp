@@ -3,14 +3,7 @@
 LanguagePhrasesParser g_Extension;	
 SMEXT_LINK(&g_Extension);
 
-IFileSystem* g_pFileSystem = NULL;
 ILanguageFileParser* g_pLanguageFileParser = NULL;
-
-bool LanguagePhrasesParser::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late)
-{
-	GET_V_IFACE_CURRENT(GetEngineFactory, g_pFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
-	return true;
-}
 
 void LanguagePhrasesParser::NotifyInterfaceDrop(SMInterface* pInterface)
 {
