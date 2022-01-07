@@ -294,3 +294,33 @@ void CPhrasesGenerator::ParseTokensFromFile(const char* pszLangFileBase, const c
 		DevWarning("'%s': %s\n", relativePath, error);
 	}
 }
+
+void CPhrasesGenerator::LoadWhitelist()
+{
+	char szWhitelistPath[PLATFORM_MAX_PATH];
+
+	// Get path with SM.
+	smutils->BuildPath(Path_SM, szWhitelistPath, sizeof(szWhitelistPath), "configs/LanguagePhrasesParser/Whitelist.txt");
+
+	// Creates the folder if it's missing.
+	CreateDirHierarchy(szWhitelistPath);
+
+	// Open file.
+	std::ifstream ifsWhiteList(szWhitelistPath);
+	if (!ifsWhiteList)
+	{
+		DevWarning("No Whitelist found\n");
+		return;
+	}
+
+	std::string line;
+	while (std::getline(ifsWhiteList, line))
+	{
+		if (line.size() > 0)
+		{
+			m_vecLangWhitelist.push_back(line);
+		}
+	}
+
+	ifsWhiteList.close();
+}
