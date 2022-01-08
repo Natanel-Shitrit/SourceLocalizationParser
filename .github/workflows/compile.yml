@@ -61,7 +61,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt install -y clang-9 libc++abi-dev libstdc++-6-dev
+          sudo apt install -y clang-9 libc++abi-dev libstdc++-6-dev gcc-multilib g++-multilib
       
       - name: 🖨️ Select clang compiler (🐧)
         if: runner.os == 'Linux'
