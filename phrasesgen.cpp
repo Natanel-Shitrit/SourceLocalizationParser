@@ -299,7 +299,7 @@ void CPhrasesGenerator::LoadWhitelist()
 	char szWhitelistPath[PLATFORM_MAX_PATH];
 
 	// Get path with SM.
-	smutils->BuildPath(Path_SM, szWhitelistPath, sizeof(szWhitelistPath), "configs/LanguagePhrasesParser/whitelist.txt");
+	smutils->BuildPath(Path_SM, szWhitelistPath, sizeof(szWhitelistPath), "configs/lpp_whitelist.txt");
 
 	// Creates the folder if it's missing.
 	CreateDirHierarchy(szWhitelistPath);
