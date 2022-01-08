@@ -101,16 +101,6 @@ jobs:
           ref: ${{ matrix.meta_branch }}
           path: metamod-${{ matrix.meta_branch }}
 
-      - name: ✔️ Checkout SDKs
-        shell: bash
-        run: |
-          git clone --mirror https://github.com/alliedmodders/hl2sdk hl2sdk-proxy-repo
-          sdks=(bgt blade bms contagion csgo css dods dota eye hl2dm insurgency l4d l4d2 nucleardawn orangebox portal2 swarm tf2)
-          for sdk in "${sdks[@]}"
-          do
-            git clone hl2sdk-proxy-repo -b $sdk hl2sdk-$sdk
-          done
-
       - name: ✔️ Checkout Own Repository
         uses: actions/checkout@v2
         with:
