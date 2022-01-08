@@ -11,7 +11,7 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
-#include <experimental/filesystem>
+#include <filesystem>
 
 class CPhrasesGenerator :
 	public ILanguageFileParserListener,

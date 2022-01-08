@@ -6,8 +6,8 @@
 
 void CreateDirHierarchy(const char* pszPath)
 {
-	std::string path = std::experimental::filesystem::path(pszPath).parent_path();
-	std::experimental::filesystem::create_directories(path);
+	std::string path = std::filesystem::path(pszPath).parent_path();
+	std::filesystem::create_directories(path);
 }
 
 const char* ConvertKeyToLowerCase(const char* pszIn)
@@ -239,12 +239,12 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 			CreateDirHierarchy(szActualPath);
 		}
 
-		if (std::experimental::filesystem::exists(szActualPath))
+		if (std::filesystem::exists(szActualPath))
 		{
 			unlink(szActualPath);
 		}
 
-		std::experimental::filesystem::rename(szTempPath, szActualPath);
+		std::filesystem::rename(szTempPath, szActualPath);
 	}
 }
 
