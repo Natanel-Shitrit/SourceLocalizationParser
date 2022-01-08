@@ -61,7 +61,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt install clang-9 -y --install-suggests
+          sudo apt install -y clang-9 g++-multilib
       
       - name: 🖨️ Select clang compiler (🐧)
         if: runner.os == 'Linux'
@@ -111,7 +111,7 @@ jobs:
         working-directory: src
         run: |
           mkdir build && cd build
-          CC=clang-9 CXX=clang++-9 python ../configure.py --enable-optimize --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_branch }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_branch }}"
+          python ../configure.py --enable-optimize --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_branch }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_branch }}"
           ambuild
 
       - name: 🏷️ Upload Package
