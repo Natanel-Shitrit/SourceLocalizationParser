@@ -4,14 +4,10 @@
 #include <cstdio>
 #include <iomanip>
 
-extern IFileSystem* g_pFileSystem;
-
 void CreateDirHierarchy(const char* pszPath)
 {
-	char szPathOnly[PLATFORM_MAX_PATH];
-	V_strncpy(szPathOnly, pszPath, sizeof(szPathOnly));
-	V_StripFilename(szPathOnly);
-	g_pFileSystem->CreateDirHierarchy(szPathOnly);
+	std::string path = std::filesystem::path(pszPath).parent_path().string();
+	std::filesystem::create_directories(path);
 }
 
 const char* ConvertKeyToLowerCase(const char* pszIn)
@@ -42,11 +38,11 @@ void CPhrasesGenerator::SDK_OnUnload()
 
 ParseAction_t CPhrasesGenerator::State_EnteredSection(const char* pszKey)
 {
-	if (m_nSection == Section_None && V_stricmp(pszKey, "lang") == 0)
+	if (m_nSection == Section_None && strcasecmp(pszKey, "lang") == 0)
 	{
 		m_nSection = Section_Settings;
 	}
-	else if (m_nSection == Section_Settings && V_stricmp(pszKey, "tokens") == 0)
+	else if (m_nSection == Section_Settings && strcasecmp(pszKey, "tokens") == 0)
 	{
 		m_nSection = Section_Tokens;
 	}
@@ -62,7 +58,7 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 	}
 
 	// Ignore phrases in non-english files that contain original line
-	if (!m_bEnglishFile && V_strnicmp(pszKey, "[english]", 9) == 0)
+	if (!m_bEnglishFile && strncasecmp(pszKey, "[english]", 9) == 0)
 	{
 		return Parse_Continue;
 	}
@@ -160,7 +156,7 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 
 void CPhrasesGenerator::State_Ended(bool halted, bool failed)
 {
-	DevMsg("\tParsed %u\n", m_nParsed);
+	META_CONPRINTF("\tParsed %u\n", m_nParsed);
 
 	m_Out
 		<< "\t// " << m_nParsed << " phrases\n";
@@ -182,19 +178,19 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 		const char* pszLanguage = NULL;
 		if (!translator->GetLanguageInfo(n, &m_pszLangCode, &pszLanguage))
 		{
-			DevMsg("Couldn't 'GetLanguageInfo' for n = %d\n", n);
+			META_CONPRINTF("Couldn't 'GetLanguageInfo' for n = %d\n", n);
 			continue;
 		}
 
-		m_bEnglishFile = V_stricmp(pszLanguage, "english") == 0;
+		m_bEnglishFile = strcasecmp(pszLanguage, "english") == 0;
 
 		if (!m_bEnglishFile && !m_vecLangWhitelist.empty() && std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), pszLanguage) == m_vecLangWhitelist.end())
 		{
-			DevMsg("skipping %s (not in whitelist)\n", pszLanguage);
+			META_CONPRINTF("skipping %s (not in whitelist)\n", pszLanguage);
 			continue;
 		}
 
-		DevMsg("Processing '%s' \"%s\"\n", m_pszLangCode, pszLanguage);
+		META_CONPRINTF("Processing '%s' \"%s\"\n", m_pszLangCode, pszLanguage);
 
 		m_nParsed = 0;
 		m_nSection = Section_None;
@@ -202,7 +198,7 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 		m_Out.open(szTempPath);
 		if (!m_Out.is_open())
 		{
-			DevMsg("Unable to open temp file \"%s\"\n", szTempPath);
+			META_CONPRINTF("Unable to open temp file \"%s\"\n", szTempPath);
 			break;
 		}
 
@@ -243,23 +239,19 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 			CreateDirHierarchy(szActualPath);
 		}
 
-		if (g_pFileSystem->FileExists(szActualPath))
+		if (std::filesystem::exists(szActualPath))
 		{
-			g_pFileSystem->RemoveFile(szActualPath);
+			unlink(szActualPath);
 		}
 
-		if (!g_pFileSystem->RenameFile(szTempPath, szActualPath))
-		{
-			DevWarning("Unable to move file \"%s\" to \"%s\"\n", szTempPath, szActualPath);
-			continue;
-		}
+		std::filesystem::rename(szTempPath, szActualPath);
 	}
 }
 
 void CPhrasesGenerator::OnTerminate(IThreadHandle* pHandle, bool cancel)
 {
 	auto now = std::chrono::high_resolution_clock::now();
-	Msg("Generated translations in \"sourcemod/translations/\" (%ums)\n", std::chrono::duration_cast<std::chrono::milliseconds>(now - m_tmBegin).count());
+	META_CONPRINTF("Generated translations in \"sourcemod/translations/\" (%ums)\n", std::chrono::duration_cast<std::chrono::milliseconds>(now - m_tmBegin).count());
 
 	m_pThread = NULL;
 }
@@ -268,13 +260,13 @@ void CPhrasesGenerator::Generate()
 {
 	if (m_pThread != NULL)
 	{
-		Msg("Operation in progress\n");
+		META_CONPRINTF("Operation in progress\n");
 		return;
 	}
 
 	if (g_pLanguageFileParser == NULL)
 	{
-		Msg("Requires langparser.ext\n");
+		META_CONPRINTF("Requires langparser.ext\n");
 		return;
 	}
 
@@ -298,7 +290,7 @@ void CPhrasesGenerator::ParseTokensFromFile(const char* pszLangFileBase, const c
 	ParseError_t parseError = g_pLanguageFileParser->ParseFile(relativePath, this, error, sizeof(error));
 	if (parseError != ParseError_None && parseError != ParseError_StreamOpen)
 	{
-		DevWarning("'%s': %s\n", relativePath, error);
+		META_CONPRINTF("'%s': %s\n", relativePath, error);
 	}
 }
 
@@ -316,7 +308,7 @@ void CPhrasesGenerator::LoadWhitelist()
 	std::ifstream ifsWhiteList(szWhitelistPath);
 	if (!ifsWhiteList)
 	{
-		DevWarning("No Whitelist found\n");
+		META_CONPRINTF("No Whitelist found\n");
 		return;
 	}
 
