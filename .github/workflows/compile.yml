@@ -62,7 +62,7 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
-          sudo apt install -y clang gcc-9 g++-9 g++-multilib
+          sudo apt install -y clang g++-9-multilib
       
       - name: 🖨️ Select clang compiler (🐧)
         if: runner.os == 'Linux'
