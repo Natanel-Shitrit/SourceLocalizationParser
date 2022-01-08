@@ -6,7 +6,10 @@
 
 void CreateDirHierarchy(const char* pszPath)
 {
+	// Get path without file name.
 	std::string path = std::filesystem::path(pszPath).parent_path().string();
+
+	// Create all directories for file path.
 	std::filesystem::create_directories(path);
 }
 
@@ -218,7 +221,6 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 
 		if (m_bReqTerm)
 		{
-			// Remove temp file
 			unlink(szTempPath);
 			break;
 		}
@@ -306,12 +308,15 @@ void CPhrasesGenerator::LoadWhitelist()
 
 	// Open file.
 	std::ifstream ifsWhiteList(szWhitelistPath);
+
+	// Create file (and skip whitelist parsing) if not present.
 	if (!ifsWhiteList)
 	{
-		META_CONPRINTF("No Whitelist found\n");
+		std::ofstream { szWhitelistPath };
 		return;
 	}
 
+	// Parse whitelist languages.
 	std::string line;
 	while (std::getline(ifsWhiteList, line))
 	{
@@ -321,5 +326,6 @@ void CPhrasesGenerator::LoadWhitelist()
 		}
 	}
 
+	// Close file.
 	ifsWhiteList.close();
 }
