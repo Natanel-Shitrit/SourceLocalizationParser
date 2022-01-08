@@ -6,7 +6,7 @@
 
 void CreateDirHierarchy(const char* pszPath)
 {
-	std::string path = std::filesystem::path(pszPath).parent_path();
+	std::string path = std::filesystem::path(pszPath).parent_path().string();
 	std::filesystem::create_directories(path);
 }
 
