@@ -4,10 +4,10 @@
 #include <cstdio>
 #include <iomanip>
 
-void CreateDirHierarchy(const char* pszPath)
+void CreateDirHierarchy(const char* filePath)
 {
 	// Get path without file name.
-	std::string path = std::filesystem::path(pszPath).parent_path().string();
+	std::string path = std::filesystem::path(filePath).parent_path().string();
 
 	// Create all directories for file path.
 	std::filesystem::create_directories(path);
@@ -24,13 +24,13 @@ void CPhrasesGenerator::SDK_OnUnload()
 	}
 }
 
-ParseAction_t CPhrasesGenerator::State_EnteredSection(const char* pszKey)
+ParseAction_t CPhrasesGenerator::State_EnteredSection(const char* key)
 {
-	if (m_nSection == Section_None && strcasecmp(pszKey, "lang") == 0)
+	if (m_nSection == Section_None && strcasecmp(key, "lang") == 0)
 	{
 		m_nSection = Section_Settings;
 	}
-	else if (m_nSection == Section_Settings && strcasecmp(pszKey, "tokens") == 0)
+	else if (m_nSection == Section_Settings && strcasecmp(key, "tokens") == 0)
 	{
 		m_nSection = Section_Tokens;
 	}
@@ -38,7 +38,7 @@ ParseAction_t CPhrasesGenerator::State_EnteredSection(const char* pszKey)
 	return Parse_Continue;
 }
 
-ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* const pszValue)
+ParseAction_t CPhrasesGenerator::State_KeyValue(const char* key, const char* const value)
 {
 	if (m_nSection != Section_Tokens)
 	{
@@ -46,16 +46,16 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 	}
 
 	// Ignore phrases in non-english files that contain original line
-	if (!m_bEnglishFile && strncasecmp(pszKey, "[english]", 9) == 0)
+	if (!m_bEnglishFile && strncasecmp(key, "[english]", 9) == 0)
 	{
 		return Parse_Continue;
 	}
 
 	m_Out
-		<< "\t\"" << pszKey << "\"\n"
+		<< "\t\"" << key << "\"\n"
 		<< "\t{\n";
 
-	const char* pch = pszValue;
+	const char* pch = value;
 
 	m_Out
 		<< "\t\t\"" << m_pszLangCode << "\"\t\t\"";
@@ -97,39 +97,39 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 {
 	m_tmBegin = std::chrono::high_resolution_clock::now();
 
-	char szTempPath[PLATFORM_MAX_PATH];
-	smutils->BuildPath(Path_SM, szTempPath, sizeof(szTempPath), "data/translation_api/phrases.tmp.txt");
-	CreateDirHierarchy(szTempPath);
+	char tempPath[PLATFORM_MAX_PATH];
+	smutils->BuildPath(Path_SM, tempPath, sizeof(tempPath), "data/translation_api/phrases.tmp.txt");
+	CreateDirHierarchy(tempPath);
 
-	const char *pszGameFolderName = g_pSM->GetGameFolderName();
+	const char* gameFolderName = g_pSM->GetGameFolderName();
 
 	size_t count = translator->GetLanguageCount();
 	for (size_t n = 0; n < count; n++)
 	{
-		const char* pszLanguage = NULL;
-		if (!translator->GetLanguageInfo(n, &m_pszLangCode, &pszLanguage))
+		const char* language = NULL;
+		if (!translator->GetLanguageInfo(n, &m_pszLangCode, &language))
 		{
 			META_CONPRINTF("Couldn't 'GetLanguageInfo' for n = %d\n", n);
 			continue;
 		}
 
-		m_bEnglishFile = strcasecmp(pszLanguage, "english") == 0;
+		m_bEnglishFile = strcasecmp(language, "english") == 0;
 
-		if (!m_bEnglishFile && !m_vecLangWhitelist.empty() && std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), pszLanguage) == m_vecLangWhitelist.end())
+		if (!m_bEnglishFile && !m_vecLangWhitelist.empty() && std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), language) == m_vecLangWhitelist.end())
 		{
-			META_CONPRINTF("skipping %s (not in whitelist)\n", pszLanguage);
+			META_CONPRINTF("skipping %s (not in whitelist)\n", language);
 			continue;
 		}
 
-		META_CONPRINTF("Processing '%s' \"%s\"\n", m_pszLangCode, pszLanguage);
+		META_CONPRINTF("Processing '%s' \"%s\"\n", m_pszLangCode, language);
 
 		m_nParsed = 0;
 		m_nSection = Section_None;
 
-		m_Out.open(szTempPath);
+		m_Out.open(tempPath);
 		if (!m_Out.is_open())
 		{
-			META_CONPRINTF("Unable to open temp file \"%s\"\n", szTempPath);
+			META_CONPRINTF("Unable to open temp file \"%s\"\n", tempPath);
 			break;
 		}
 
@@ -142,14 +142,14 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 			<< "\"Phrases\"\n"
 			<< "{\n";
 
-		ParseTokensFromFile(pszGameFolderName, pszLanguage);
+		ParseTokensFromFile(gameFolderName, language);
 
 		m_Out << "}\n";
 		m_Out.close();
 
 		if (m_bReqTerm)
 		{
-			unlink(szTempPath);
+			unlink(tempPath);
 			break;
 		}
 
@@ -158,23 +158,23 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 			continue;
 		}
 
-		char szActualPath[PLATFORM_MAX_PATH];
+		char actualPath[PLATFORM_MAX_PATH];
 		if (m_bEnglishFile)
 		{
-			smutils->BuildPath(Path_SM, szActualPath, sizeof(szActualPath), "translations/%s.phrases.txt", pszGameFolderName);
+			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s.phrases.txt", gameFolderName);
 		}
 		else
 		{
-			smutils->BuildPath(Path_SM, szActualPath, sizeof(szActualPath), "translations/%s/%s.phrases.txt", m_pszLangCode, pszGameFolderName);
-			CreateDirHierarchy(szActualPath);
+			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s/%s.phrases.txt", m_pszLangCode, gameFolderName);
+			CreateDirHierarchy(actualPath);
 		}
 
-		if (std::filesystem::exists(szActualPath))
+		if (std::filesystem::exists(actualPath))
 		{
-			unlink(szActualPath);
+			unlink(actualPath);
 		}
 
-		std::filesystem::rename(szTempPath, szActualPath);
+		std::filesystem::rename(tempPath, actualPath);
 	}
 }
 
@@ -204,43 +204,43 @@ void CPhrasesGenerator::Generate()
 }
 
 
-void CPhrasesGenerator::ParseTokensFromFile(const char* pszLangFileBase, const char* pszLanguage)
+void CPhrasesGenerator::ParseTokensFromFile(const char* baseLangFile, const char* language)
 {
 	if (m_bReqTerm)
 	{
 		return;
 	}
 
-	char relativePath[PLATFORM_MAX_PATH];
-	smutils->Format(relativePath, sizeof(relativePath), "resource/%s_%s.txt", pszLangFileBase, pszLanguage);
+	char relative_path[PLATFORM_MAX_PATH];
+	smutils->Format(relative_path, sizeof(relative_path), "resource/%s_%s.txt", baseLangFile, language);
 
-	m_Out << "\t// Input file: " << relativePath << "\n";
+	m_Out << "\t// Input file: " << relative_path << "\n";
 
 	char error[256];
-	ParseError_t parseError = g_pLanguageFileParser->ParseFile(relativePath, this, error, sizeof(error));
+	ParseError_t parseError = g_pLanguageFileParser->ParseFile(relative_path, this, error, sizeof(error));
 	if (parseError != ParseError_None && parseError != ParseError_StreamOpen)
 	{
-		META_CONPRINTF("'%s': %s\n", relativePath, error);
+		META_CONPRINTF("'%s': %s\n", relative_path, error);
 	}
 }
 
 void CPhrasesGenerator::LoadWhitelist()
 {
-	char szWhitelistPath[PLATFORM_MAX_PATH];
+	char whitelistPath[PLATFORM_MAX_PATH];
 
 	// Get path with SM.
-	smutils->BuildPath(Path_SM, szWhitelistPath, sizeof(szWhitelistPath), "configs/lpp_whitelist.txt");
+	smutils->BuildPath(Path_SM, whitelistPath, sizeof(whitelistPath), "configs/lpp_whitelist.txt");
 
 	// Creates the folder if it's missing.
-	CreateDirHierarchy(szWhitelistPath);
+	CreateDirHierarchy(whitelistPath);
 
 	// Open file.
-	std::ifstream ifsWhiteList(szWhitelistPath);
+	std::ifstream ifsWhiteList(whitelistPath);
 
 	// Create file (and skip whitelist parsing) if not present.
 	if (!ifsWhiteList)
 	{
-		std::ofstream { szWhitelistPath };
+		std::ofstream { whitelistPath };
 		return;
 	}
 

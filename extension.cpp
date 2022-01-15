@@ -5,9 +5,9 @@ SMEXT_LINK(&g_Extension);
 
 ILanguageFileParser* g_pLanguageFileParser = NULL;
 
-void LanguagePhrasesParser::NotifyInterfaceDrop(SMInterface* pInterface)
+void LanguagePhrasesParser::NotifyInterfaceDrop(SMInterface* interface)
 {
-	if (g_pLanguageFileParser == pInterface)
+	if (g_pLanguageFileParser == interface)
 	{
 		CPhrasesGenerator::SDK_OnUnload();
 		g_pLanguageFileParser = NULL;
