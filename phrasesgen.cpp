@@ -52,42 +52,10 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 	}
 
 	m_Out
-		//<< "\t// Token: \"" << pszKey << "\"\n"
 		<< "\t\"" << pszKey << "\"\n"
 		<< "\t{\n";
 
 	const char* pch = pszValue;
-	if (m_bEnglishFile)
-	{
-		// Look out for "%sN" and place #format replacements
-		bool bHadFormat = false;
-		
-		while (*pch != '\0')
-		{
-			char ch = *(pch++);
-			if (ch == '%' && *pch == 's' && isdigit(*(pch + 1)) != 0)
-			{
-				if (bHadFormat)
-				{
-					m_Out << ",{" << *(pch + 1) << ":s}";
-				}
-				else
-				{
-					bHadFormat = true;
-					m_Out << "\t\t\"#format\"\t\"{" << *(pch + 1) << ":s}";
-				}
-
-				pch += 2;
-			}
-		}
-
-		if (bHadFormat)
-		{
-			m_Out << "\"\n";
-		}
-
-		pch = pszValue;
-	}
 
 	m_Out
 		<< "\t\t\"" << m_pszLangCode << "\"\t\t\"";
@@ -95,40 +63,18 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 	// Escape some special characters
 	while (*pch != '\0')
 	{
-		char ch = *(pch++);
-		if (ch == '\n')
+		switch (*pch)
 		{
-			m_Out << "\\n";
+			case '\n': m_Out << "\\n"; break;
+			case '\v': m_Out << "\\v"; break;
+			case '\r': m_Out << "\\r"; break;
+			case '\t': m_Out << "\\t"; break;
+			case '\f': m_Out << "\\f"; break;
+			case '"': m_Out << "\\\""; break;
+			default: m_Out << *pch;
 		}
-		else if (ch == '\v')
-		{
-			m_Out << "\\v";
-		}
-		else if (ch == '\r')
-		{
-			m_Out << "\\r";
-		}
-		else if (ch == '\t')
-		{
-			m_Out << "\\t";
-		}
-		else if (ch == '\f')
-		{
-			m_Out << "\\f";
-		}
-		else if (ch == '"')
-		{
-			m_Out << "\\\"";
-		}
-		else if (ch == '%' && *pch == 's' && isdigit(*(pch + 1)) != 0)
-		{
-			m_Out << '{' << *(pch + 1) << '}';
-			pch += 2;
-		}
-		else
-		{
-			m_Out << ch;
-		}
+
+		pch++;
 	}
 	
 	m_Out << "\"\n"
