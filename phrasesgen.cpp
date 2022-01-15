@@ -13,21 +13,6 @@ void CreateDirHierarchy(const char* pszPath)
 	std::filesystem::create_directories(path);
 }
 
-const char* ConvertKeyToLowerCase(const char* pszIn)
-{
-	static char s_key[MAX_KEY_LENGTH];
-	static const char* const pszLast = s_key + sizeof(s_key) - 1;
-
-	char* pszOut = s_key;
-	while (*pszIn != '\0' && pszOut != pszLast)
-	{
-		*(pszOut++) = (char)tolower(*(pszIn++));
-	}
-
-	*pszOut = '\0';
-	return s_key;
-}
-
 void CPhrasesGenerator::SDK_OnUnload()
 {
 	if (m_pThread != NULL)
@@ -66,12 +51,9 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* pszKey, const char* 
 		return Parse_Continue;
 	}
 
-	// Convert key to lower case
-	const char* pszFixedKey = ConvertKeyToLowerCase(pszKey);
-
 	m_Out
 		//<< "\t// Token: \"" << pszKey << "\"\n"
-		<< "\t\"" << pszFixedKey << "\"\n"
+		<< "\t\"" << pszKey << "\"\n"
 		<< "\t{\n";
 
 	const char* pch = pszValue;
