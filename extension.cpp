@@ -22,6 +22,15 @@ void LanguagePhrasesParser::SDK_OnUnload()
 
 void LanguagePhrasesParser::SDK_OnAllLoaded()
 {
+	// Get language parser interface.
 	SM_GET_LATE_IFACE(ILANGPARSER, g_pLanguageFileParser);
+
+	// Save game folder name.
+	g_pszGameFolderName = g_pSM->GetGameFolderName();
+
+	// Load whitelist.
+	g_Extension.LoadWhitelist();
+
+	// Generate phrases files.
 	g_Extension.Generate();
 }

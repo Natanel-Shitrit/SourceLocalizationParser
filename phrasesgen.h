@@ -25,9 +25,7 @@ public:
 		m_nParsed(0),
 		m_pThread(NULL),
 		m_bReqTerm(false)
-	{
-		LoadWhitelist();
-	}
+	{}
 
 public:
 	void Generate();
