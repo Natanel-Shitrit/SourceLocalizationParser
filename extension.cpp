@@ -4,6 +4,7 @@ LanguagePhrasesParser g_Extension;
 SMEXT_LINK(&g_Extension);
 
 ILanguageFileParser* g_pLanguageFileParser = NULL;
+const char* g_pszGameFolderName = NULL;
 
 void LanguagePhrasesParser::NotifyInterfaceDrop(SMInterface* interface)
 {

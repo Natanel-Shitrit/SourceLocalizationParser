@@ -5,6 +5,7 @@
 #include "phrasesgen.h"
 
 extern ILanguageFileParser* g_pLanguageFileParser;
+extern const char* g_pszGameFolderName;
 
 /**
  * @file extension.h

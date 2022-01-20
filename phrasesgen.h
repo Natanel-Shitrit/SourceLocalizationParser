@@ -61,8 +61,9 @@ private:
 	IThreadHandle* m_pThread;
 	std::atomic<bool> m_bReqTerm;
 	std::chrono::high_resolution_clock::time_point m_tmBegin;
+	std::vector<std::pair<std::string, std::string>> m_Languages;
 
-	void ParseTokensFromFile(const char* pszBase, const char* pszLanguage);
+	void ParseTokensFromFile(const char* pszLanguage);
 
 public: // IThread
 	/**

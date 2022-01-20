@@ -95,38 +95,35 @@ void CPhrasesGenerator::State_Ended(bool halted, bool failed)
 
 void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 {
+	// Save thread start time.
 	m_tmBegin = std::chrono::high_resolution_clock::now();
 
 	char tempPath[PLATFORM_MAX_PATH];
+	
+	// Build absolute path from relative SM path.
 	smutils->BuildPath(Path_SM, tempPath, sizeof(tempPath), "data/translation_api/phrases.tmp.txt");
+
+	// Create all non-existing directories in path.
 	CreateDirHierarchy(tempPath);
 
-	const char* gameFolderName = g_pSM->GetGameFolderName();
-
-	size_t count = translator->GetLanguageCount();
-	for (size_t n = 0; n < count; n++)
+	// Loop languages.
+	const char* language;
+	for (auto& lang : m_Languages)
 	{
-		const char* language = NULL;
-		if (!translator->GetLanguageInfo(n, &m_pszLangCode, &language))
-		{
-			META_CONPRINTF("Couldn't 'GetLanguageInfo' for n = %d\n", n);
-			continue;
-		}
-
-		m_bEnglishFile = strcasecmp(language, "english") == 0;
-
-		if (!m_bEnglishFile && !m_vecLangWhitelist.empty() && std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), language) == m_vecLangWhitelist.end())
-		{
-			META_CONPRINTF("skipping %s (not in whitelist)\n", language);
-			continue;
-		}
+		// Get data from pair.
+		m_pszLangCode = lang.first.c_str();
+		language = lang.second.c_str();
 
 		META_CONPRINTF("Processing '%s' \"%s\"\n", m_pszLangCode, language);
 
 		m_nParsed = 0;
 		m_nSection = Section_None;
+		m_bEnglishFile = strcasecmp(language, "english") == 0;
 
+		// Open temp file to write to.
 		m_Out.open(tempPath);
+
+		// Stop if the temp file couldn't be opened.
 		if (!m_Out.is_open())
 		{
 			META_CONPRINTF("Unable to open temp file \"%s\"\n", tempPath);
@@ -142,7 +139,7 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 			<< "\"Phrases\"\n"
 			<< "{\n";
 
-		ParseTokensFromFile(gameFolderName, language);
+		ParseTokensFromFile(language);
 
 		m_Out << "}\n";
 		m_Out.close();
@@ -161,11 +158,11 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 		char actualPath[PLATFORM_MAX_PATH];
 		if (m_bEnglishFile)
 		{
-			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s.phrases.txt", gameFolderName);
+			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s.phrases.txt", g_pszGameFolderName);
 		}
 		else
 		{
-			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s/%s.phrases.txt", m_pszLangCode, gameFolderName);
+			smutils->BuildPath(Path_SM, actualPath, sizeof(actualPath), "translations/%s/%s.phrases.txt", m_pszLangCode, g_pszGameFolderName);
 			CreateDirHierarchy(actualPath);
 		}
 
@@ -176,6 +173,8 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 
 		std::filesystem::rename(tempPath, actualPath);
 	}
+
+	m_Languages.clear();
 }
 
 void CPhrasesGenerator::OnTerminate(IThreadHandle* pHandle, bool cancel)
@@ -200,11 +199,36 @@ void CPhrasesGenerator::Generate()
 		return;
 	}
 
+	const char* languageCode;
+	const char* language;
+	size_t count = translator->GetLanguageCount();
+	for (size_t n = 0; n < count; n++)
+	{
+		if (!translator->GetLanguageInfo(n, &languageCode, &language))
+		{
+			META_CONPRINTF("Couldn't 'GetLanguageInfo' for n = %d\n", n);
+			continue;
+		}
+			// Don't filter english. (main phrases file should always exits to load it to SM)
+		if (strcasecmp(language, "english") == 0 ||
+			// If the whitelist is empty, skip the search.
+			m_vecLangWhitelist.empty() ||
+			// Language is found in the whitelist, add it.
+			std::find(m_vecLangWhitelist.begin(), m_vecLangWhitelist.end(), language) != m_vecLangWhitelist.end())
+		{
+			m_Languages.emplace_back(languageCode, language);
+		}
+		else
+		{
+			META_CONPRINTF("skipping %s (not in whitelist)\n", language);
+		}
+	}
+
 	m_pThread = threader->MakeThread(this, NULL);
 }
 
 
-void CPhrasesGenerator::ParseTokensFromFile(const char* baseLangFile, const char* language)
+void CPhrasesGenerator::ParseTokensFromFile(const char* language)
 {
 	if (m_bReqTerm)
 	{
@@ -212,7 +236,7 @@ void CPhrasesGenerator::ParseTokensFromFile(const char* baseLangFile, const char
 	}
 
 	char relative_path[PLATFORM_MAX_PATH];
-	smutils->Format(relative_path, sizeof(relative_path), "resource/%s_%s.txt", baseLangFile, language);
+	smutils->Format(relative_path, sizeof(relative_path), "resource/%s_%s.txt", g_pszGameFolderName, language);
 
 	m_Out << "\t// Input file: " << relative_path << "\n";
 
