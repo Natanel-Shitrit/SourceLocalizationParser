@@ -1,9 +1,6 @@
 #include "phrasesgen.h"
 #include "extension.h"
 
-#include <cstdio>
-#include <iomanip>
-
 void CreateDirHierarchy(const char* filePath)
 {
 	// Get path without file name.

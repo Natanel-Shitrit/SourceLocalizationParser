@@ -4,14 +4,14 @@
 #include "smsdk_ext.h"
 #include "ILanguageFileParser.h"
 
-#include <string>
-#include <unordered_set>
 #include <fstream>
+#include <filesystem>
+
+#ifdef POSIX
 #include <atomic>
-#include <chrono>
 #include <vector>
 #include <algorithm>
-#include <filesystem>
+#endif
 
 class CPhrasesGenerator :
 	public ILanguageFileParserListener,
