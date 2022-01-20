@@ -26,6 +26,7 @@ public:
 		m_pThread(NULL),
 		m_bReqTerm(false)
 	{
+		LoadWhitelist();
 	}
 
 public:
