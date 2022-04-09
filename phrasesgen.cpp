@@ -10,6 +10,20 @@ void CreateDirHierarchy(const char* filePath)
 	std::filesystem::create_directories(path);
 }
 
+const char* ConvertKeyToLowerCase(const char* pszIn)
+{
+	static char szOut[MAX_KEY_LENGTH];
+	char* pszOut = szOut;
+
+	while (*pszIn)
+	{
+		*pszOut++ = tolower(*pszIn++);
+	}
+
+	*pszOut = '\0';
+	return szOut;
+}
+
 void CPhrasesGenerator::SDK_OnUnload()
 {
 	if (m_pThread != NULL)
@@ -49,7 +63,7 @@ ParseAction_t CPhrasesGenerator::State_KeyValue(const char* key, const char* con
 	}
 
 	m_Out
-		<< "\t\"" << key << "\"\n"
+		<< "\t\"" << ConvertKeyToLowerCase(key) << "\"\n"
 		<< "\t{\n";
 
 	const char* pch = value;
