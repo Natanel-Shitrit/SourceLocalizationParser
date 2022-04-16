@@ -6,11 +6,10 @@
 
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 
 #ifdef POSIX
 #include <atomic>
-#include <vector>
-#include <algorithm>
 #endif
 
 class CPhrasesGenerator :
