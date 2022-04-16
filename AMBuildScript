@@ -107,7 +107,7 @@ class ExtensionConfig(object):
       '-pipe',
       '-fno-strict-aliasing',
       '-Wall',
-      '-fpermissive',
+      '-Werror',
       '-Wno-unused',
       '-Wno-switch',
       '-Wno-array-bounds',
@@ -117,6 +117,7 @@ class ExtensionConfig(object):
     ]
     cxx.cxxflags += [
       '-std=c++17',
+      '-fpermissive',
       '-fno-exceptions',
       '-fno-threadsafe-statics',
       '-Wno-non-virtual-dtor',
@@ -286,4 +287,4 @@ if builder.backend == 'amb2':
     'PackageScript',
   ]
 
-builder.RunBuildScripts(BuildScripts, { 'Extension': Extension})
+builder.RunBuildScripts(BuildScripts, { 'Extension': Extension })
