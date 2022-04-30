@@ -1,5 +1,4 @@
-# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
-import os, sys
+import os
 
 # Simple extensions do not need to modify this file.
 
@@ -17,7 +16,7 @@ def ResolveEnvPath(env, folder):
     if os.path.isdir(path):
       return path
     oldhead = head
-    head, tail = os.path.split(head)
+    head, _ = os.path.split(head)
 
   return None
 
@@ -223,13 +222,12 @@ class ExtensionConfig(object):
 	
   def ConfigureForExtension(self, context, compiler):
     compiler.cxxincludes += [
-      os.path.join(context.currentSourcePath),
-      os.path.join(context.currentSourcePath, 'sdk'),
+      os.path.join(context.currentSourcePath, 'ext'),
       os.path.join(self.sm_root, 'public'),
       os.path.join(self.sm_root, 'public', 'extensions'),
-      os.path.join(self.sm_root, 'sourcepawn', 'include'),
-      os.path.join(self.sm_root, 'public', 'amtl', 'amtl'),
       os.path.join(self.sm_root, 'public', 'amtl'),
+      os.path.join(self.sm_root, 'public', 'amtl', 'amtl'), 
+      os.path.join(self.sm_root, 'sourcepawn', 'include'),
     ]
     return compiler
 
