@@ -7,6 +7,8 @@
 #include <map>
 #include <string>
 
+#include "smsdk_ext.h"
+
 class CLocalize
 {
 public:
@@ -63,46 +65,17 @@ public:
         Clear();
     }
 
-    void ParseFile(std::filesystem::path filePath)
-    {
-        std::ifstream file(filePath, std::ios::binary);
+    void ParseFile(std::filesystem::path filePath);
+    void ParseGameLocalizationFile(std::string language);
+    void ParseGameLocalizationFiles(std::vector<std::string> languages);
 
-        // Check if file is open
-        if (!file)
-        {
-            std::cout << "Unable to open file" << std::endl;
-            return;
-        }
-
-        // Get file size
-        auto size = std::filesystem::file_size(filePath);
-
-        // Allocate buffer
-        std::u16string fileContent;
-        fileContent.resize(size / 2);
-
-        // Read file
-        file.read((char*)&fileContent[0], size);
-
-        // Close file
-        file.close();
-
-        // Remove the BOM.
-        fileContent.erase(0, 1);
-
-        // Parse the content.
-        Parse(std::move(fileContent));
-    }
-
-    void ParseGameLocalizationFile()
-    {
-        
-    }
-
-private:
-    std::u16string_view m_Content { u"" };
-    std::u16string m_CurrentLanguage { u"" };
+private: // Parser variables.
+    std::u16string_view m_Content {};
+    std::u16string m_CurrentLanguage {};
     size_t m_LexPos { 0 };
+
+private: // Game related variables.
+    std::string m_GameFolderName {};
 
 public:
     Languages m_Languages;

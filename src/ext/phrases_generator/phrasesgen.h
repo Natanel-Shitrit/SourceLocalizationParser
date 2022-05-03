@@ -19,7 +19,6 @@ class CPhrasesGenerator :
 private:
     // Threading
     IThreadHandle* m_pThread { nullptr };
-    std::atomic<bool> m_bTerminateRequested { false };
 
     // Languages
     std::vector<std::pair<std::string, std::string>> m_Languages;
@@ -44,14 +43,7 @@ public: // Public methods
 private: // Private methods
     void LoadWhitelist();
     void LoadLanguages();
-    bool IsLanguageWhitelisted(std::string language)
-    {
-        return \
-            // Check if language is in whitelist (if whitelist is empty, all languages are whitelisted).
-            std::find(m_LanguageWhitelist.begin(), m_LanguageWhitelist.end(), language) != std::end(m_LanguageWhitelist)
-            // If it's english, it's always whitelisted. (main phrases file should always exits to load it to SM)
-            || language == "english";
-    }
+    bool IsLanguageWhitelisted(std::string language);
 
 public: // IThread
     /**

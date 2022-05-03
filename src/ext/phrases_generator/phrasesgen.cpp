@@ -7,8 +7,22 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
     auto startTime = std::chrono::high_resolution_clock::now();
 
     /// TODO:
-    // Parse all languages.
-    // Generate phrases files.
+    // Test if this compiles and runs as expected.
+    std::vector<std::string> languageNames;
+
+    // Get only languages names from m_Languages.
+    std::transform(
+        m_Languages.begin(),
+        m_Languages.end(),
+        std::back_inserter(languageNames),
+        [](auto const& pair){ return pair.second; }
+    );
+
+    // Parse all languages. [DONE]
+    m_Localizer.ParseGameLocalizationFiles(languageNames);
+
+    // Generate phrases files. [WIP]
+    m_Localizer.GeneratePhrasesFromParsedFiles();
 
     // Notify about generation end.
     std::cout
@@ -81,6 +95,19 @@ void CPhrasesGenerator::LoadLanguages()
     }
 }
 
+bool CPhrasesGenerator::IsLanguageWhitelisted(std::string language)
+{
+    return \
+        // Check if language is in whitelist (if whitelist is empty, all languages are whitelisted).
+        std::find(
+            m_LanguageWhitelist.begin(),
+            m_LanguageWhitelist.end(),
+            language
+        ) != std::end(m_LanguageWhitelist)
+        // If it's english, it's always whitelisted. (main phrases file should always exits to load it to SM)
+        || language == "english";
+}
+
 // Public functions implementation
 void CPhrasesGenerator::Generate()
 {
@@ -98,13 +125,7 @@ void CPhrasesGenerator::SDK_OnUnload()
     // check if thread is running.
     if (m_pThread != NULL)
     {
-        // We can't quit yet - notify a thread about unloading.
-        m_bTerminateRequested = true;
-
         // Wait for thread to terminate.
         m_pThread->WaitForThread();
-
-        // reset the terminate flag.
-        m_bTerminateRequested = false;
     }
 }

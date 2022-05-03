@@ -117,3 +117,76 @@ void CLocalize::Parse()
         }
     }
 }
+
+void CLocalize::ParseFile(std::filesystem::path filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+
+    // Check if file is open
+    if (!file)
+    {
+        std::cout << "Unable to open file" << std::endl;
+        return;
+    }
+
+    // Get file size
+    auto size = std::filesystem::file_size(filePath);
+
+    // Allocate buffer
+    std::u16string fileContent;
+    fileContent.resize(size / 2);
+
+    // Read file
+    file.read(fileContent.data(), size);
+
+    // Close file
+    file.close();
+
+    // Remove the BOM.
+    fileContent.erase(0, 1);
+
+    // Parse the content.
+    Parse(std::move(fileContent));
+}
+
+void CLocalize::ParseGameLocalizationFile(std::string language)
+{
+    if (m_GameFolderName.empty())
+    {
+        m_GameFolderName = std::string(g_pSM->GetGameFolderName());
+    }
+
+    std::string localizationFilePath;
+    localizationFilePath.resize(PLATFORM_MAX_PATH);
+    
+    // Build path to localization file.
+    g_pSM->BuildPath(
+        Path_Game,
+        localizationFilePath.data(),
+        PLATFORM_MAX_PATH,
+        "resource/%s_%s.txt",
+        m_GameFolderName.c_str(),
+        language.c_str()
+    );
+
+    // Parse localization file.
+    ParseFile(localizationFilePath);
+}
+
+void CLocalize::ParseGameLocalizationFiles(std::vector<std::string> languages)
+{
+    for (auto& language : languages)
+    {
+        ParseGameLocalizationFile(language);
+    }
+}
+
+/*
+void CLocalize::GeneratePhrasesFromParsedFiles()
+{
+    for (auto const& [language, langTokens] : m_Languages)
+    {
+        /// TODO: Implement generation.
+    }
+}
+*/
