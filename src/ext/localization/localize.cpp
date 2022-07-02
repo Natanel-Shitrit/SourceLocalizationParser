@@ -137,7 +137,7 @@ void CLocalize::ParseFile(std::filesystem::path filePath)
     fileContent.resize(size / 2);
 
     // Read file
-    file.read(fileContent.data(), size);
+    file.read((char *)fileContent.data(), size);
 
     // Close file
     file.close();
@@ -146,7 +146,7 @@ void CLocalize::ParseFile(std::filesystem::path filePath)
     fileContent.erase(0, 1);
 
     // Parse the content.
-    Parse(std::move(fileContent));
+    Parse(fileContent);
 }
 
 void CLocalize::ParseGameLocalizationFile(std::string language)
