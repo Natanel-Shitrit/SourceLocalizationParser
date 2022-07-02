@@ -180,13 +180,3 @@ void CLocalize::ParseGameLocalizationFiles(std::vector<std::string> languages)
         ParseGameLocalizationFile(language);
     }
 }
-
-/*
-void CLocalize::GeneratePhrasesFromParsedFiles()
-{
-    for (auto const& [language, langTokens] : m_Languages)
-    {
-        /// TODO: Implement generation.
-    }
-}
-*/
