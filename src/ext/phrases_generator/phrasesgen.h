@@ -7,12 +7,6 @@
 #include <filesystem>
 #include <iostream>
 
-#ifdef POSIX
-#include <atomic>
-#endif
-
-#define WHITELIST_FILE_PATH "configs/slpg_whitelist.txt"
-
 class CPhrasesGenerator :
     public IThread
 {
