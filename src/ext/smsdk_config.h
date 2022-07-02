@@ -7,12 +7,12 @@
  */
 
 /* Basic information exposed publicly */
-#define SMEXT_CONF_NAME			"SourceLocalizationPhrasesGenerator"
-#define SMEXT_CONF_DESCRIPTION	"Parses Source-Engine localization files and generates SourceMod translations files."
+#define SMEXT_CONF_NAME			"SourceLocalizationParser"
+#define SMEXT_CONF_DESCRIPTION	"Generates SourceMod translations files from Source-Engine localization files."
 #define SMEXT_CONF_VERSION		"1.0.0.0"
 #define SMEXT_CONF_AUTHOR		"LuqS"
 #define SMEXT_CONF_URL			"https://github.com/Natanel-Shitrit/"
-#define SMEXT_CONF_LOGTAG		"SLPG"
+#define SMEXT_CONF_LOGTAG		"SLP"
 #define SMEXT_CONF_LICENSE		"GPL"
 #define SMEXT_CONF_DATESTRING	__DATE__
 

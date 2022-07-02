@@ -1,6 +1,6 @@
 import os
 
-projectName = 'SourceLocalizationPhrasesGenerator'
+projectName = 'SourceLocalizationParser'
 
 # All source files that need to be compiled
 sourceFiles = [

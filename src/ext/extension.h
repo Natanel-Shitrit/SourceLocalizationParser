@@ -2,11 +2,10 @@
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 
 #include "phrases_generator/phrasesgen.h"
-#include <string>
 
 #include "smsdk_ext.h"
 
-class SourceLocalizationPhrasesGenerator :
+class SourceLocalizationParser :
     public CPhrasesGenerator,
     public SDKExtension
 {
