@@ -8,6 +8,7 @@
 #include <iostream>
 
 class CPhrasesGenerator :
+    public CLocalize,
     public IThread
 {
 private:
@@ -15,21 +16,13 @@ private:
     IThreadHandle* m_pThread { nullptr };
 
     // Languages
-    std::vector<std::pair<std::string, std::string>> m_Languages;
+    std::map<std::string, std::string> m_LanguageCodeNames;
 
     // Whitelist
     std::vector<std::string> m_LanguageWhitelist;
 
-    // Localizer
-    CLocalize m_Localizer;
-
 public: // Public methods
-    CPhrasesGenerator()
-    {
-        // Load whitelist and languages.
-        LoadWhitelist();
-        LoadLanguages();
-    }
+    CPhrasesGenerator() {}
 
     void Generate();
     void SDK_OnUnload();
