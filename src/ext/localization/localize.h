@@ -74,7 +74,7 @@ private: // Parser variables.
     std::u16string m_CurrentLanguage {};
     size_t m_LexPos { 0 };
 
-private: // Game related variables.
+protected: // Game related variables.
     std::string m_GameFolderName {};
 
 public:
