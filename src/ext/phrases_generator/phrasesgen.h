@@ -31,6 +31,7 @@ private: // Private methods
     void LoadWhitelist();
     void LoadLanguages();
     bool IsLanguageWhitelisted(std::string language);
+    void GeneratePhrasesFromParsedFiles();
 
 public: // IThread
     /**

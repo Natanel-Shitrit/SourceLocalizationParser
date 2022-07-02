@@ -1,28 +1,35 @@
 #include "phrasesgen.h"
 
+static std::string U16StringToUTF8(const std::u16string u16)
+{
+    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
+}
+
 // IThread implementation
 void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 {
     // Save thread start time.
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    /// TODO:
-    // Test if this compiles and runs as expected.
+    LoadLanguages();
+
     std::vector<std::string> languageNames;
 
-    // Get only languages names from m_Languages.
+    // Get only languages names from m_LanguageCodeNames.
     std::transform(
-        m_Languages.begin(),
-        m_Languages.end(),
+        m_LanguageCodeNames.begin(),
+        m_LanguageCodeNames.end(),
         std::back_inserter(languageNames),
-        [](auto const& pair){ return pair.second; }
+        [](const auto& pair) { return pair.first; }
     );
 
+    std::cout << "Parsing " << languageNames.size() << " Languages" << std::endl;
+
     // Parse all languages. [DONE]
-    m_Localizer.ParseGameLocalizationFiles(languageNames);
+    ParseGameLocalizationFiles(languageNames);
 
     // Generate phrases files. [WIP]
-    m_Localizer.GeneratePhrasesFromParsedFiles();
+    GeneratePhrasesFromParsedFiles();
 
     // Notify about generation end.
     std::cout
@@ -40,8 +47,17 @@ void CPhrasesGenerator::OnTerminate(IThreadHandle* pHandle, bool cancel)
 // Private methods implementation
 void CPhrasesGenerator::LoadWhitelist()
 {
-    char whitelistPath[PLATFORM_MAX_PATH];
-    smutils->BuildPath(Path_SM, whitelistPath, sizeof(whitelistPath), WHITELIST_FILE_PATH);
+    std::string whitelistPath;
+    whitelistPath.resize(PLATFORM_MAX_PATH);
+
+    smutils->BuildPath(
+        Path_SM,
+        whitelistPath.data(),
+        PLATFORM_MAX_PATH,
+        "configs/slp_whitelist.txt"
+    );
+
+    std::cout << whitelistPath << std::endl;
 
     std::ifstream whitelist(whitelistPath);
 
@@ -70,6 +86,8 @@ void CPhrasesGenerator::LoadWhitelist()
 
 void CPhrasesGenerator::LoadLanguages()
 {
+    LoadWhitelist();
+
     const char *languageCode, *language;
     auto count = translator->GetLanguageCount();
 
@@ -83,6 +101,8 @@ void CPhrasesGenerator::LoadLanguages()
             continue;
         }
 
+        std::cout << "languageCode: " << languageCode << ", language: " << language << std::endl;
+
         // Check if language is whitelisted.
         if (!IsLanguageWhitelisted(std::string(language)))
         {
@@ -91,21 +111,100 @@ void CPhrasesGenerator::LoadLanguages()
         }
 
         // Add language to whitelist.
-        m_Languages.emplace_back(std::string(languageCode), std::string(language));
+        m_LanguageCodeNames[std::string(language)] = std::string(languageCode);
     }
 }
 
 bool CPhrasesGenerator::IsLanguageWhitelisted(std::string language)
 {
     return \
-        // Check if language is in whitelist (if whitelist is empty, all languages are whitelisted).
+        // If whitelist is empty, all languages are whitelisted
+        m_LanguageWhitelist.empty() ||
+        // Check if language is in whitelist.
         std::find(
             m_LanguageWhitelist.begin(),
             m_LanguageWhitelist.end(),
             language
-        ) != std::end(m_LanguageWhitelist)
+        ) != std::end(m_LanguageWhitelist) ||
         // If it's english, it's always whitelisted. (main phrases file should always exits to load it to SM)
-        || language == "english";
+        language == "english";
+}
+
+void CPhrasesGenerator::GeneratePhrasesFromParsedFiles()
+{
+    // Create phrases file path.
+    std::string translationsBasePath;
+    translationsBasePath.resize(PLATFORM_MAX_PATH);
+
+    smutils->BuildPath(
+        Path_SM,
+        translationsBasePath.data(),
+        PLATFORM_MAX_PATH,
+        "translations"
+    );
+
+    translationsBasePath.resize(translationsBasePath.find('\0'));
+
+    for (auto const& [language, langTokens] : m_Languages)
+    {
+        std::string languageCode = m_LanguageCodeNames[U16StringToUTF8(language)];
+
+        // Create phrases file path.
+        std::ostringstream phrasesFilePath;
+
+        phrasesFilePath << translationsBasePath;
+
+        if (language != u"English")
+        {
+            if (languageCode.empty())
+            {
+                std::cout << "Language \"" << U16StringToUTF8(language) << "\" has no code" << std::endl;
+                continue;
+            }
+
+            phrasesFilePath << "/" + languageCode;
+        }
+
+        phrasesFilePath << "/" << m_GameFolderName << ".phrases.txt";
+
+        // Create phrases file.
+        std::ofstream phrasesFile(phrasesFilePath.str());
+
+        if (phrasesFile.fail())
+        {
+            std::cout << "Failed to open \"" << phrasesFilePath.str() << std::endl;
+            continue;
+        }
+
+        // Write phrases file header.
+        phrasesFile << "// " << U16StringToUTF8(language) << " phrases file" << "\n"
+                    << "// Generated by 'Source Localization Parser'" << "\n"
+                    << "\n";
+
+        phrasesFile << "\"Phrases\"" << "\n"
+                    << "{" << "\n";
+
+        std::cout << "Writing " << langTokens.size() << " tokens!" << "\n";
+
+        // Write phrases file content.
+        for (auto const& [key, value] : langTokens)
+        {
+            phrasesFile << "\t" << "\"" << U16StringToUTF8(key) << "\"" << "\n"
+                        << "\t" << "{" << "\n"
+                        << "\t" << "\t" << "\"" << languageCode << "\"" << "\t" << "\t" << "\"" << U16StringToUTF8(value) << "\"" << "\n"
+                        << "\t" << "}" << "\n"
+                        << "\n";
+        }
+
+        // Write phrases file footer.
+        phrasesFile << "}" << "\n";
+
+        // Close file.
+        phrasesFile.close();
+
+        // Notify about phrases file generation.
+        std::cout << "Generated phrases file \"" << phrasesFilePath.str() << "\"" << std::endl;
+    }
 }
 
 // Public functions implementation
