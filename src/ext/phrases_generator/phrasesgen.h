@@ -7,6 +7,11 @@
 #include <filesystem>
 #include <iostream>
 
+#ifdef _WIN32
+#include <codecvt>
+#include <sstream>
+#endif
+
 class CPhrasesGenerator :
     public CLocalize,
     public IThread
