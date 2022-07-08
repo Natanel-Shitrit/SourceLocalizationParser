@@ -2,7 +2,7 @@
 
 static std::string U16StringToUTF8(const std::u16string u16)
 {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
+    return (static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}).to_bytes(std::move(u16));
 }
 
 // IThread implementation
