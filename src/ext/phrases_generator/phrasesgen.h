@@ -6,7 +6,10 @@
 
 #include <filesystem>
 #include <iostream>
-#include <codecvt>
+
+#ifdef _WIN32
+#include <sstream>
+#endif
 
 class CPhrasesGenerator :
     public CLocalize,
