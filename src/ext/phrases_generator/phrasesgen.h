@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <codecvt>
 
 class CPhrasesGenerator :
     public CLocalize,
