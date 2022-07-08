@@ -8,6 +8,7 @@
 #include <iostream>
 
 #ifdef _WIN32
+#include <codecvt>
 #include <sstream>
 #endif
 
