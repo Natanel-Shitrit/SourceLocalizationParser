@@ -133,7 +133,7 @@ void CPhrasesGenerator::GeneratePhrasesFromParsedFiles()
 
     for (auto const& [language, langTokens] : m_Languages)
     {
-        std::wstring languageCode = m_LanguageCodeNames[language];
+        std::wstring& languageCode = m_LanguageCodeNames[language];
 
         if (languageCode.empty())
         {

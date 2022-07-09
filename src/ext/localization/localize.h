@@ -64,9 +64,9 @@ public:
         Clear();
     }
 
-    void ParseFile(std::filesystem::path filePath);
+    void ParseFile(std::filesystem::path& filePath);
     void ParseGameLocalizationFile(std::string_view language);
-    void ParseGameLocalizationFiles(std::vector<std::string> languages);
+    void ParseGameLocalizationFiles(std::vector<std::string>& languages);
 
 private: // Parser variables.
     std::wstring_view m_Content {};
@@ -78,9 +78,9 @@ public:
 };
 
 template <typename T>
-static void StringToLower(std::basic_string<T> *str)
+static void StringToLower(std::basic_string<T>& str)
 {
-    std::transform(str->begin(), str->end(), str->begin(),
+    std::transform(str.begin(), str.end(), str.begin(),
         [](unsigned char c){ return std::tolower(c); });
 }
 
