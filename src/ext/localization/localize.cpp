@@ -133,7 +133,7 @@ void CLocalize::ParseFile(std::filesystem::path filePath)
     // Check if file is open
     if (!file)
     {
-        std::cout << "Unable to open file" << std::endl;
+        std::cout << "Unable to open file (" << filePath << ")" << std::endl;
         return;
     }
 
