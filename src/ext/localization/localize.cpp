@@ -91,22 +91,20 @@ void CLocalize::Parse()
                 // If next token is also a value, it's a LangToken or the file language.
                 if ((nextToken = LexNext()).type == LexTokenType::Value)
                 {
-                    // If the value is "Language", this is the key that holds the file language.
-                    if (token.value == u"Language")
-                    {
-                        m_CurrentLanguage = std::move(nextToken.value);
-                        break;
-                    }
-
-                    // Otherwise, It's just a normal LangToken.
-
                     // Transform key string to lower:
                         // Valve's localization system performs a case-insensitive match for localization token lookups,
                         // so the behavior of the game and your plugin (or SourceMod's translation system) behaves differently in that way.
                     std::transform(token.value.begin(), token.value.end(), token.value.begin(),
                         [](unsigned char c){ return std::tolower(c); });
 
-                    // Store the value to the key in the current language.
+                    // If the value is "language", this is the key that holds the file language.
+                    if (token.value == u"language")
+                    {
+                        m_CurrentLanguage = std::move(nextToken.value);
+                        break;
+                    }
+
+                    // Otherwise, It's just a normal LangToken.
                     m_Languages[m_CurrentLanguage][token.value] = std::move(nextToken.value);
                     break;
                 }
