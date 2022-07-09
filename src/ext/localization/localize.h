@@ -77,4 +77,11 @@ public:
     Languages m_Languages;
 };
 
+template <typename T>
+static void StringToLower(std::basic_string<T> *str)
+{
+    std::transform(str->begin(), str->end(), str->begin(),
+        [](unsigned char c){ return std::tolower(c); });
+}
+
 #endif // _INCLUDE_LOCALIZE_H_

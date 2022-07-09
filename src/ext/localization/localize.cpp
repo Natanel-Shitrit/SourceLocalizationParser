@@ -94,12 +94,14 @@ void CLocalize::Parse()
                     // Transform key string to lower:
                         // Valve's localization system performs a case-insensitive match for localization token lookups,
                         // so the behavior of the game and your plugin (or SourceMod's translation system) behaves differently in that way.
-                    std::transform(token.value.begin(), token.value.end(), token.value.begin(),
-                        [](unsigned char c){ return std::tolower(c); });
+                    StringToLower(&token.value);
 
                     // If the value is "language", this is the key that holds the file language.
                     if (token.value == u"language")
                     {
+                        // Transform the language name to lowercase also,
+                        // because for some reason VALVE capitalized only SOME language names. SMH...
+                        StringToLower(&nextToken.value);
                         m_CurrentLanguage = std::move(nextToken.value);
                         break;
                     }
