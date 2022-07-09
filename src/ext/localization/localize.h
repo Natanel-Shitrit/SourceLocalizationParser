@@ -65,16 +65,13 @@ public:
     }
 
     void ParseFile(std::filesystem::path filePath);
-    void ParseGameLocalizationFile(std::string language);
-    void ParseGameLocalizationFiles(std::vector<std::string> languages);
+    void ParseGameLocalizationFile(std::string_view language);
+    void ParseGameLocalizationFiles(std::vector<std::string_view> languages);
 
 private: // Parser variables.
     std::u16string_view m_Content {};
     std::u16string m_CurrentLanguage {};
     size_t m_LexPos { 0 };
-
-protected: // Game related variables.
-    std::string m_GameFolderName {};
 
 public:
     Languages m_Languages;

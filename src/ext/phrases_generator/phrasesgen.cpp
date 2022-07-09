@@ -14,22 +14,22 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 
     LoadLanguages();
 
-    std::vector<std::string> languageNames;
+    std::vector<std::string_view> languageNames;
 
     // Get only languages names from m_LanguageCodeNames.
     std::transform(
         m_LanguageCodeNames.begin(),
         m_LanguageCodeNames.end(),
         std::back_inserter(languageNames),
-        [](const auto& pair) { return pair.first; }
+        [](const auto& pair) { return std::string_view(pair.first); }
     );
 
     std::cout << "Parsing " << languageNames.size() << " Languages" << std::endl;
 
-    // Parse all languages. [DONE]
+    // Parse all languages.
     ParseGameLocalizationFiles(languageNames);
 
-    // Generate phrases files. [WIP]
+    // Generate phrases files.
     GeneratePhrasesFromParsedFiles();
 
     // Notify about generation end.

@@ -157,31 +157,22 @@ void CLocalize::ParseFile(std::filesystem::path filePath)
     Parse(fileContent);
 }
 
-void CLocalize::ParseGameLocalizationFile(std::string language)
+void CLocalize::ParseGameLocalizationFile(std::string_view language)
 {
-    if (m_GameFolderName.empty())
-    {
-        m_GameFolderName = std::string(g_pSM->GetGameFolderName());
-    }
-
-    std::string localizationFilePath;
-    localizationFilePath.resize(PLATFORM_MAX_PATH);
+    // Get game folder name and build game resource folder base path.
+    // Make the variables static because it's constant and will never change.
+    static std::string_view gameFolderName = g_pSM->GetGameFolderName();
+    static std::filesystem::path gameResourceFolderBasePath = std::filesystem::current_path() / gameFolderName / "resource";
     
-    // Build path to localization file.
-    g_pSM->BuildPath(
-        Path_Game,
-        localizationFilePath.data(),
-        PLATFORM_MAX_PATH,
-        "resource/%s_%s.txt",
-        m_GameFolderName.c_str(),
-        language.c_str()
-    );
+    // Build the localization file name.
+    std::ostringstream fileName;
+    fileName << gameFolderName << "_" << language << ".txt";
 
     // Parse localization file.
-    ParseFile(localizationFilePath);
+    ParseFile((gameResourceFolderBasePath / fileName.str()));
 }
 
-void CLocalize::ParseGameLocalizationFiles(std::vector<std::string> languages)
+void CLocalize::ParseGameLocalizationFiles(std::vector<std::string_view> languages)
 {
     for (auto& language : languages)
     {
