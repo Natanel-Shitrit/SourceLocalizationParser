@@ -12,12 +12,12 @@ class CLocalize
 {
 public:
     // LangToken = { Key, Value }
-    typedef std::pair<std::u16string, std::u16string> LangToken;
-    typedef std::map<std::u16string, std::u16string> LangTokens;
+    typedef std::pair<std::wstring, std::wstring> LangToken;
+    typedef std::map<std::wstring, std::wstring> LangTokens;
 
     // Language = { Name, Tokens }
-    typedef std::pair<std::u16string, CLocalize::LangTokens> Language;
-    typedef std::map<std::u16string, CLocalize::LangTokens> Languages;
+    typedef std::pair<std::wstring, CLocalize::LangTokens> Language;
+    typedef std::map<std::wstring, CLocalize::LangTokens> Languages;
 
 private:
     enum class LexTokenType
@@ -36,9 +36,9 @@ private:
     struct LexToken
     {
         LexTokenType type;
-        std::u16string value;
+        std::wstring value;
 
-        LexToken(LexTokenType type = LexTokenType::None, std::u16string value = u"")
+        LexToken(LexTokenType type = LexTokenType::None, std::wstring value = L"")
             : type(type), value(std::move(value))
         {}
     };
@@ -56,7 +56,7 @@ public:
     CLocalize() {}
     ~CLocalize() {}
 
-    void Parse(std::u16string_view content)
+    void Parse(std::wstring_view content)
     {
         // Save content.
         m_Content = std::move(content);
@@ -66,11 +66,11 @@ public:
 
     void ParseFile(std::filesystem::path filePath);
     void ParseGameLocalizationFile(std::string_view language);
-    void ParseGameLocalizationFiles(std::vector<std::string_view> languages);
+    void ParseGameLocalizationFiles(std::vector<std::string> languages);
 
 private: // Parser variables.
-    std::u16string_view m_Content {};
-    std::u16string m_CurrentLanguage {};
+    std::wstring_view m_Content {};
+    std::wstring m_CurrentLanguage {};
     size_t m_LexPos { 0 };
 
 public:

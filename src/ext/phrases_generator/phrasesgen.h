@@ -21,7 +21,7 @@ private:
     IThreadHandle* m_pThread { nullptr };
 
     // Languages
-    std::map<std::string, std::string> m_LanguageCodeNames;
+    std::map<std::wstring, std::wstring> m_LanguageCodeNames;
 
     // Whitelist
     std::vector<std::string> m_LanguageWhitelist;
@@ -35,7 +35,7 @@ public: // Public methods
 private: // Private methods
     void LoadWhitelist();
     void LoadLanguages();
-    bool IsLanguageWhitelisted(std::string language);
+    bool IsLanguageWhitelisted(std::string_view language);
     void GeneratePhrasesFromParsedFiles();
 
 public: // IThread
@@ -54,5 +54,18 @@ public: // IThread
      */
     void OnTerminate(IThreadHandle* pHandle, bool cancel) override;
 };
+
+template <typename T>
+static std::string StringToUTF8(const std::basic_string<T> str)
+{
+    static std::wstring_convert<std::codecvt_utf8<T>, T> convertor;
+    return convertor.to_bytes(str);
+}
+
+template <typename T>
+static std::wstring StringToWide(const std::basic_string<T> str)
+{
+    return std::wstring(str.begin(), str.end());
+}
 
 #endif // _INCLUDE_PHRASESGEN_H_

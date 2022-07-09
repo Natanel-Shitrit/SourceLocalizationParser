@@ -2,7 +2,7 @@
 
 CLocalize::LexToken CLocalize::LexNext()
 {
-    std::u16string value = u"";
+    std::wstring value = L"";
 
     while (m_LexPos < m_Content.size())
     {
@@ -97,7 +97,7 @@ void CLocalize::Parse()
                     StringToLower(&token.value);
 
                     // If the value is "language", this is the key that holds the file language.
-                    if (token.value == u"language")
+                    if (token.value == L"language")
                     {
                         // Transform the language name to lowercase also,
                         // because for some reason VALVE capitalized only SOME language names. SMH...
@@ -141,7 +141,7 @@ void CLocalize::ParseFile(std::filesystem::path filePath)
     auto size = std::filesystem::file_size(filePath);
 
     // Allocate buffer
-    std::u16string fileContent;
+    std::wstring fileContent;
     fileContent.resize(size / 2);
 
     // Read file
@@ -172,7 +172,7 @@ void CLocalize::ParseGameLocalizationFile(std::string_view language)
     ParseFile((gameResourceFolderBasePath / fileName.str()));
 }
 
-void CLocalize::ParseGameLocalizationFiles(std::vector<std::string_view> languages)
+void CLocalize::ParseGameLocalizationFiles(std::vector<std::string> languages)
 {
     for (auto& language : languages)
     {
