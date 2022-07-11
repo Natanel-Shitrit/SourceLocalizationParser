@@ -37,17 +37,8 @@ void CPhrasesGenerator::OnTerminate(IThreadHandle* pHandle, bool cancel)
 // Private methods implementation
 void CPhrasesGenerator::LoadWhitelist()
 {
-    std::string whitelistPath;
-    whitelistPath.resize(PLATFORM_MAX_PATH);
-
-    smutils->BuildPath(
-        Path_SM,
-        whitelistPath.data(),
-        PLATFORM_MAX_PATH,
-        "configs/slp_whitelist.txt"
-    );
-
-    std::cout << whitelistPath << std::endl;
+    std::filesystem::path whitelistPath = smutils->GetSourceModPath();
+    whitelistPath = whitelistPath / "configs" / "slp_whitelist.txt";
 
     std::ifstream whitelist(whitelistPath);
     if (!whitelist)
