@@ -3,14 +3,12 @@
 // IThread implementation
 void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 {
-    // Save thread start time.
     auto startTime = std::chrono::high_resolution_clock::now();
 
     LoadLanguages();
 
-    std::vector<std::string> languageNames;
-
     // Get only languages names from m_LanguageCodeNames.
+    std::vector<std::string> languageNames;
     std::transform(
         m_LanguageCodeNames.begin(),
         m_LanguageCodeNames.end(),
@@ -20,10 +18,7 @@ void CPhrasesGenerator::RunThread(IThreadHandle* pHandle)
 
     std::cout << "Parsing " << languageNames.size() << " Languages" << std::endl;
 
-    // Parse all languages.
     ParseGameLocalizationFiles(languageNames);
-
-    // Generate phrases files.
     GeneratePhrasesFromParsedFiles();
 
     // Notify about generation end.
@@ -55,27 +50,24 @@ void CPhrasesGenerator::LoadWhitelist()
     std::cout << whitelistPath << std::endl;
 
     std::ifstream whitelist(whitelistPath);
-
-    // Create whitelist file (and skip whitelist parsing) if not present.
     if (!whitelist)
     {
+        // If the whitelist file doesn't exist, create it.
         std::ofstream { whitelistPath };
         return;
     }
 
-    // Read file.
     std::string line;
     while (std::getline(whitelist, line))
     {
         // Skip empty lines and comments (# or //).
         if (line.empty() || line.front() == '#' || line.front() == '/')
             continue;
-
-        // Add language to whitelist.
+        
+        // Adds the language to the whitelist class member.
         m_LanguageWhitelist.push_back(std::move(line));
     }
-
-    // Close file.
+    
     whitelist.close();
 }
 
@@ -113,7 +105,7 @@ void CPhrasesGenerator::LoadLanguages()
 bool CPhrasesGenerator::IsLanguageWhitelisted(std::string_view language)
 {
     return \
-        // If whitelist is empty, all languages are whitelisted
+        // If whitelist is empty, all languages are whitelisted.
         m_LanguageWhitelist.empty() ||
         // Check if language is in whitelist.
         std::find(
@@ -127,7 +119,6 @@ bool CPhrasesGenerator::IsLanguageWhitelisted(std::string_view language)
 
 void CPhrasesGenerator::GeneratePhrasesFromParsedFiles()
 {
-    // Get SourceMod base path:
     static std::filesystem::path translationsBasePath = smutils->GetSourceModPath();
     translationsBasePath /= "translations";
 
@@ -137,11 +128,11 @@ void CPhrasesGenerator::GeneratePhrasesFromParsedFiles()
 
         if (languageCode.empty())
         {
-            std::wcout << L"Language \"" << language << L"\" has no code" << std::endl;
+            // If the language code is empty, it means the language is not whitelisted.
+            std::wcout << L"Skipping \"" << language << L"\"" << std::endl;
             continue;
         }
-
-        // Create phrases file.
+        
         std::ofstream phrasesFile(
             translationsBasePath / 
                 StringToUTF8(language != L"english" ? languageCode : L"") /
@@ -177,11 +168,10 @@ void CPhrasesGenerator::GeneratePhrasesFromParsedFiles()
 
         phrasesFile << StringToUTF8(output.str());
 
-        // Close file.
-        phrasesFile.close();
-
         // Notify about phrases file generation.
         std::wcout << L"Generated " << langTokens.size() << L" " << language << L" phrases." << std::endl;
+
+        phrasesFile.close();
     }
 }
 
