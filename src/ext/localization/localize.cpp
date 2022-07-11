@@ -42,25 +42,9 @@ CLocalize::LexToken CLocalize::LexNext()
                             return CLocalize::LexToken(LexTokenType::Value, std::move(value));
                         
                         case '\\':
-                            m_LexPos++;
-                            if (m_LexPos < m_Content.size())
-                            {
-                                switch (m_Content[m_LexPos])
-                                {
-                                    case 'n': value += '\n'; break;
-                                    case 't': value += '\t'; break;
-                                    case 'r': value += '\r'; break;
-                                    default:
-                                        value += '\\';
-                                        [[fallthrough]];
-                                    case '"':
-                                    case '\'':
-                                    case '\\':
-                                        value += m_Content[m_LexPos];
-                                        break;
-                                }
-                            }
-                            break;
+                            // Adds '\' and then falls to default to add the escaped character.
+                            value += m_Content[m_LexPos++];
+                            [[fallthrough]];
                         
                         default:
                             value += m_Content[m_LexPos];
