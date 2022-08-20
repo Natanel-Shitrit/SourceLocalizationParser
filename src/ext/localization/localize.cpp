@@ -114,7 +114,7 @@ void CLocalize::Parse()
     }
 }
 
-void CLocalize::ParseFile(std::filesystem::path& filePath)
+void CLocalize::ParseFile(const std::filesystem::path& filePath)
 {
     std::ifstream file(filePath, std::ios::binary);
 

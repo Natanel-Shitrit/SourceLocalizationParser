@@ -64,7 +64,7 @@ public:
         Clear();
     }
 
-    void ParseFile(std::filesystem::path& filePath);
+    void ParseFile(const std::filesystem::path& filePath);
     void ParseGameLocalizationFile(std::string_view language);
     void ParseGameLocalizationFiles(std::vector<std::string>& languages);
 
