@@ -2,8 +2,9 @@
 #define _INCLUDE_LOCALIZE_H_
 
 #include <iostream>
-#include <filesystem>
 #include <fstream>
+#include <sstream>
+#include <filesystem>
 #include <map>
 
 #include "smsdk_ext.h"
