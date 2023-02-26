@@ -1,4 +1,4 @@
-# LanguagePhrasesParser
+# SourceLocalizationParser
 Parses game language files to SourceMod phrases translations.
 
 ## Credits:

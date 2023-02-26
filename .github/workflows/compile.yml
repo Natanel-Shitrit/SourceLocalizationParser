@@ -118,5 +118,5 @@ jobs:
       - name: 🏷️ Upload Package
         uses: actions/upload-artifact@v2
         with:
-          name: LanguagePhrasesParser
+          name: SourceLocalizationParser
           path: src/build/package
