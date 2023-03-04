@@ -51,20 +51,9 @@ private:
     void Parse();
 
 public:
-    void Clear()
-    {
-        m_Content = {};
-        m_LexPos = 0;
-    }
-
     void ParseGameLocalizationFile();
     void ParseFile(const std::filesystem::path& filePath);
-    void ParseString(std::wstring_view content)
-    {
-        m_Content = std::move(content)+;
-        Parse();
-        Clear();
-    }
+    void ParseString(std::wstring_view content);
 
 private:
     std::wstring_view m_Content {};
@@ -73,12 +62,5 @@ private:
 public:
     Language m_Language;
 };
-
-template <typename T>
-static void StringToLower(std::basic_string<T>& str)
-{
-    std::transform(str.begin(), str.end(), str.begin(),
-        [](unsigned char c){ return std::tolower(c); });
-}
 
 #endif // _INCLUDE_LOCALIZE_H_

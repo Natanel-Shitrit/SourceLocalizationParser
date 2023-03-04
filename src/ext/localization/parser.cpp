@@ -201,5 +201,19 @@ void LocalizationParser::ParseGameLocalizationFile(std::string_view language)
     fileName << gameFolderName << "_" << language << ".txt";
 
     // Parse localization file.
-    ParseFile((gameResourceFolderBasePath / fileName.str()));
+    this->ParseFile((gameResourceFolderBasePath / fileName.str()));
+}
+
+void LocalizationParser::ParseString(std::wstring_view content)
+{
+    m_Content = std::move(content);
+    this->Parse();
+}
+
+// Other
+template <typename T>
+static void StringToLower(std::basic_string<T>& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(),
+        [](unsigned char c){ return std::tolower(c); });
 }
