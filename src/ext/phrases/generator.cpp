@@ -33,3 +33,17 @@ void PhrasesFileGenerator::Generate()
 {
     
 }
+
+// Other
+template <typename T>
+static std::string StringToUTF8(const std::basic_string<T>& str)
+{
+    static std::wstring_convert<std::codecvt_utf8<T>, T> convertor;
+    return convertor.to_bytes(str);
+}
+
+template <typename T>
+static std::wstring StringToWide(const std::basic_string<T>& str)
+{
+    return std::wstring(str.begin(), str.end());
+}
