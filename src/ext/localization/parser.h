@@ -37,9 +37,6 @@ public:
 private:
     std::wstring_view m_Content {};
     size_t m_LexPos { 0 };
-
-public:
-    Language m_Language;
 };
 
 #endif // _INCLUDE_LOCALIZE_H_
