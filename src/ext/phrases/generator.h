@@ -1,7 +1,6 @@
 #ifndef _INCLUDE_PHRASESGEN_H_
 #define _INCLUDE_PHRASESGEN_H_
 
-#include "localization/localize.h"
 #include "smsdk_ext.h"
 
 #include <filesystem>
@@ -11,6 +10,7 @@
 #include <codecvt>
 #include <sstream>
 #endif
+
 
 class PhrasesFileGenerator
 {

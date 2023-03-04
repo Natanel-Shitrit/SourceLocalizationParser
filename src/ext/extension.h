@@ -1,13 +1,13 @@
 #ifndef _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 
+#include <filesystem>
+#include <iostream>
+
 #include "localization/parser.h"
 #include "phrases/generator.h"
 
 #include "smsdk_ext.h"
-
-#include <filesystem>
-#include <iostream>
 
 
 class SourceLocalizationParser:

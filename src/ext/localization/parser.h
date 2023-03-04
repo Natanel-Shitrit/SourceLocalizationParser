@@ -1,13 +1,15 @@
 #ifndef _INCLUDE_LOCALIZE_H_
 #define _INCLUDE_LOCALIZE_H_
 
+#include "smsdk_ext.h"
+#include "localization/lex.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
 #include <map>
 
-#include "smsdk_ext.h"
 
 // { Key, Value }
 typedef std::pair<std::wstring, std::wstring> LangToken;
