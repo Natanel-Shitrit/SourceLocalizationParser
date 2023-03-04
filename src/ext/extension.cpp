@@ -19,8 +19,8 @@ void SourceLocalizationParser::ProcessLanguages()
 
     // Run 'ProcessLanguage' on all languages.
     std::transform(
-        this->m_Languages.begin(),
-        this->m_Languages.end(),
+        m_Languages.begin(),
+        m_Languages.end(),
         std::back_inserter(threads),
         [](std::string language){ return std::thread(this->ProcessLanguage, language) }
     )
@@ -77,7 +77,7 @@ void SourceLocalizationParser::LoadLanguages()
             continue;
         
         // Adds the language to the whitelist class member.
-        this->m_Languages.push_back(std::move(line));
+        m_Languages.push_back(std::move(line));
     }
     
     whitelist.close();
