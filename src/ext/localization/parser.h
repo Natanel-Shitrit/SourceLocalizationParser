@@ -9,17 +9,18 @@
 
 #include "smsdk_ext.h"
 
-class CLocalize
+// { Key, Value }
+typedef std::pair<std::wstring, std::wstring> LangToken;
+// { LangToken, LangToken, ... }
+typedef std::map<std::wstring, std::wstring> LangTokens;
+// { Language, LangTokens }
+typedef std::pair<std::wstring, LangTokens> Language;
+// { Language, Language, ... }
+typedef std::map<std::wstring, LangTokens> Languages;
+
+// TODO: Change to template?
+class LocalizationParser
 {
-public:
-    // LangToken = { Key, Value }
-    typedef std::pair<std::wstring, std::wstring> LangToken;
-    typedef std::map<std::wstring, std::wstring> LangTokens;
-
-    // Language = { Name, Tokens }
-    typedef std::pair<std::wstring, CLocalize::LangTokens> Language;
-    typedef std::map<std::wstring, CLocalize::LangTokens> Languages;
-
 private:
     enum class LexTokenType
     {
@@ -43,39 +44,34 @@ private:
             : type(type), value(std::move(value))
         {}
     };
-
+    
     LexToken LexNext();
+    void SkipLine();
+    LexToken ReadValue();
     void Parse();
+
+public:
     void Clear()
     {
         m_Content = {};
-        m_CurrentLanguage = {};
         m_LexPos = 0;
     }
 
-public:
-    CLocalize() {}
-    ~CLocalize() {}
-
-    void Parse(std::wstring_view content)
+    void ParseGameLocalizationFile();
+    void ParseFile(const std::filesystem::path& filePath);
+    void ParseString(std::wstring_view content)
     {
-        // Save content.
-        m_Content = std::move(content);
+        m_Content = std::move(content)+;
         Parse();
         Clear();
     }
 
-    void ParseFile(const std::filesystem::path& filePath);
-    void ParseGameLocalizationFile(std::string_view language);
-    void ParseGameLocalizationFiles(std::vector<std::string>& languages);
-
-private: // Parser variables.
+private:
     std::wstring_view m_Content {};
-    std::wstring m_CurrentLanguage {};
     size_t m_LexPos { 0 };
 
 public:
-    Languages m_Languages;
+    Language m_Language;
 };
 
 template <typename T>

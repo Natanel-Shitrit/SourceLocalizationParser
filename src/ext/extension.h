@@ -1,12 +1,16 @@
 #ifndef _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 
-#include "phrases_generator/phrasesgen.h"
+#include "localization/parser.h"
+#include "phrases/generator.h"
 
 #include "smsdk_ext.h"
 
-class SourceLocalizationParser :
-    public CPhrasesGenerator,
+#include <filesystem>
+#include <iostream>
+
+
+class SourceLocalizationParser:
     public SDKExtension
 {
 public: // SDKExtension
@@ -20,6 +24,14 @@ public: // SDKExtension
      * Note: It is is a good idea to add natives here, if any are provided.
      */
     virtual void SDK_OnAllLoaded();
+
+private:
+    void LoadLanguages();
+    void ProcessLanguages();
+    void ProcessLanguage(std::string language);
+
+private:
+    std::vector<std::string> m_Languages;
 };
 
 #endif // _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
