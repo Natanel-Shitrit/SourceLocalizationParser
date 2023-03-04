@@ -6,10 +6,6 @@ SMEXT_LINK(&g_Extension);
 
 void SourceLocalizationParser::SDK_OnAllLoaded()
 {
-    this->s_GameName = g_pSM->GetGameFolderName();
-    this->s_GameResourceFolderPath = \
-        std::filesystem::current_path() / gameFolderName / "resource";
-    
     this->LoadLanguages();
     this->ProcessLanguages();
 }
