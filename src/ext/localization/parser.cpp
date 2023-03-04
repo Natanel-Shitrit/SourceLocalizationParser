@@ -1,5 +1,6 @@
 #include "localize.h"
 
+// Lexing
 LocalizationParser::LexToken LocalizationParser::LexNext()
 {
     while (m_LexPos < m_Content.size())
@@ -83,6 +84,7 @@ LocalizationParser::LexToken LocalizationParser::ReadValue()
     return LocalizationParser::LexToken(LexTokenType::None);
 }
 
+// Parsing
 bool LocalizationParser::Parse()
 {
     int braceDepth = 0;
