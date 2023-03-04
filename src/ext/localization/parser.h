@@ -12,13 +12,13 @@
 
 
 // { Key, Value }
-typedef std::pair<std::wstring, std::wstring> LangToken;
+using LangToken = std::pair<std::wstring, std::wstring>;
 // { LangToken, LangToken, ... }
-typedef std::map<std::wstring, std::wstring> LangTokens;
+using LangTokens = std::map<std::wstring, std::wstring>;
 // { Language, LangTokens }
-typedef std::pair<std::wstring, LangTokens> Language;
+using Language = std::pair<std::wstring, LangTokens>;
 // { Language, Language, ... }
-typedef std::map<std::wstring, LangTokens> Languages;
+using Languages = std::map<std::wstring, LangTokens>;
 
 // TODO: Change to template?
 class LocalizationParser
