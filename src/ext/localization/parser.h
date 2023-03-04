@@ -24,29 +24,6 @@ using Languages = std::map<std::wstring, LangTokens>;
 class LocalizationParser
 {
 private:
-    enum class LexTokenType
-    {
-        None,
-        Value,
-        // Condition, 
-        Comment,
-        BraceOpen,
-        BraceClose,
-        End
-
-        /// TODO: Implement conditionals.
-    };
-
-    struct LexToken
-    {
-        LexTokenType type;
-        std::wstring value;
-
-        LexToken(LexTokenType type = LexTokenType::None, std::wstring value = L"")
-            : type(type), value(std::move(value))
-        {}
-    };
-    
     LexToken LexNext();
     void SkipLine();
     LexToken ReadValue();
